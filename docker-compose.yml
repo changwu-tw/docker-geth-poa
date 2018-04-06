@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+  node1:
+    container_name: node1
+    build: node1
+    image: node1
+    entrypoint: /geth
+    command: "--datadir /root/data --nodekey=/root/data/geth/nodekey --networkid 9527 --bootnodes enode://96a2e0793b55be4ba16451c20f930420fd14f126e6763b8b3514187ed0208ecd6f108a35cdbd057eb91daeafbedd911f6d0b253e1871e81f46f9571244190928@172.18.250.3:30303,enode://298b3b1a6ee70a8a5190913b8ac9c56307d29b6c5218f77cd485ba9f3b7f2b9d18ffd395f82a20116891793fbde95b720d192500b8b78dedc2555a79c87c2f29@172.18.250.4:30303 --rpc --rpcaddr 0.0.0.0"
+    expose:
+      - "30303"
+      - "8545"
+    networks:
+      back:
+        ipv4_address: 172.18.250.2
+
+  node2:
+    container_name: node2
+    build: node2
+    image: node2
+    links:
+      - node1
+    entrypoint: /geth
+    command: "--datadir /root/data --nodekey=/root/data/geth/nodekey --networkid 9527 --bootnodes enode://089caa684c197c88080c40c080419ca8da065e6a7e6ae300ed007e2b84424e408ecb117cd6d201029dc4361a574f71850027059014f438ffd8ca45c4b9c137ea@172.18.250.2:30303,enode://298b3b1a6ee70a8a5190913b8ac9c56307d29b6c5218f77cd485ba9f3b7f2b9d18ffd395f82a20116891793fbde95b720d192500b8b78dedc2555a79c87c2f29@172.18.250.4:30303 --rpc --rpcaddr 0.0.0.0"
+    expose:
+      - "30303"
+      - "8545"
+    networks:
+      back:
+        ipv4_address: 172.18.250.3
+
+  node3:
+    container_name: node3
+    build: node3
+    image: node3
+    links:
+      - node2
+    entrypoint: /geth
+    command: "--datadir /root/data --nodekey=/root/data/geth/nodekey --networkid 9527 --bootnodes enode://089caa684c197c88080c40c080419ca8da065e6a7e6ae300ed007e2b84424e408ecb117cd6d201029dc4361a574f71850027059014f438ffd8ca45c4b9c137ea@172.18.250.2:30303,enode://96a2e0793b55be4ba16451c20f930420fd14f126e6763b8b3514187ed0208ecd6f108a35cdbd057eb91daeafbedd911f6d0b253e1871e81f46f9571244190928@172.18.250.3:30303 --rpc --rpcaddr 0.0.0.0"
+    expose:
+      - "30303"
+      - "8545"
+    networks:
+      back:
+        ipv4_address: 172.18.250.4
+
+networks:
+  back:
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.18.250.0/24
